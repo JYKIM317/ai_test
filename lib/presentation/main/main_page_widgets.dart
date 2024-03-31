@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_test/provider/main_page_provider.dart';
+import 'package:ai_test/presentation/main/main_page_viewmodel.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:jumping_dot/jumping_dot.dart';
 
@@ -17,7 +18,7 @@ class MainPageWidgets {
             height: double.infinity,
           );
         }
-        promptHistory = promptHistory.reversed.toList();
+        List<String> history = List.from(promptHistory.reversed.toList());
 
         return SizedBox(
           width: double.infinity,
@@ -32,17 +33,17 @@ class MainPageWidgets {
                   padding: const EdgeInsets.fromLTRB(16, 64, 16, 34),
                   itemCount: promptHistory.length,
                   itemBuilder: (BuildContext ctx, int idx) {
+                    bool isPrompt = idx % 2 != 0;
                     return Align(
-                      alignment: idx % 2 != 0
+                      alignment: isPrompt
                           ? Alignment.centerRight
                           : Alignment.centerLeft,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 20),
                         decoration: BoxDecoration(
-                          color: idx % 2 != 0
-                              ? Colors.transparent
-                              : Colors.grey[200],
+                          color:
+                              isPrompt ? Colors.transparent : Colors.grey[200],
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: Colors.grey[200]!,
@@ -50,7 +51,7 @@ class MainPageWidgets {
                           ),
                         ),
                         child: Text(
-                          promptHistory![idx],
+                          history[idx],
                           style: const TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -128,7 +129,7 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
                   maxLines: 4,
                   keyboardType: TextInputType.text,
                   onSubmitted: (text) async {
-                    if (isLoading == false) {
+                    if (isLoading == false && text.trim() != '') {
                       ref.read(promptProvider).prompting(prompt: text);
                       promptController.text = '';
                     }
@@ -139,7 +140,9 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
           ),
           IconButton(
             onPressed: () {
-              //
+              ref
+                  .read(promptProvider)
+                  .promptingFromImage(imageType: ImageType.camera);
             },
             icon: const FaIcon(
               FontAwesomeIcons.camera,
@@ -149,7 +152,9 @@ class _PromptInputWidgetState extends ConsumerState<PromptInputWidget> {
           ),
           IconButton(
             onPressed: () {
-              //
+              ref
+                  .read(promptProvider)
+                  .promptingFromImage(imageType: ImageType.gallery);
             },
             icon: const FaIcon(
               FontAwesomeIcons.image,
