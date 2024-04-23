@@ -1,8 +1,5 @@
-# ai_test
 
-A new Flutter project.
-
-## Getting Started
+## About
 
 This project is purpose for practice about generative ai, machine learning kit
 
